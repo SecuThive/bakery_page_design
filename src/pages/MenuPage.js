@@ -46,15 +46,17 @@ export default function MenuPage() {
   ];
 
   return (
-    <div className="bg-white text-gray-900 font-serif selection:bg-yellow-100 overflow-x-hidden pt-24 pb-20">
-      <div className="max-w-6xl mx-auto px-6 lg:px-8">
-        <div className="mb-24">
+    <div className="bg-white text-gray-900 font-serif selection:bg-yellow-100 overflow-x-hidden">
+      {/* HERO SECTION */}
+      <section className="relative w-full pt-32 pb-24 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <button onClick={() => navigate(-1)} className="text-yellow-700 text-sm font-bold mb-8 hover:text-yellow-800 transition-colors flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             돌아가기
           </button>
+          
           <Reveal>
             <div className="relative">
               {/* 배경 데코레이션 */}
@@ -62,16 +64,16 @@ export default function MenuPage() {
               <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-yellow-50 rounded-full opacity-30 blur-3xl"></div>
               
               <div className="relative z-10">
-                <div className="mb-4 flex items-center gap-3">
+                <div className="mb-6 flex items-center gap-3">
                   <div className="h-1 w-16 bg-gradient-to-r from-yellow-700 to-yellow-500"></div>
-                  <span className="text-yellow-700 text-xs font-bold tracking-[0.4em] uppercase">프리미엄 컬렉션</span>
+                  <span className="text-yellow-700 text-xs font-bold tracking-[0.3em] uppercase">프리미엄 컬렉션</span>
                 </div>
-                <h1 className="text-7xl lg:text-8xl font-bold text-gray-900 mb-6 leading-tight">
-                  명장의<br />정선된 빵
+                <h1 className="text-6xl lg:text-7xl font-serif font-bold text-gray-900 mb-6 leading-tight">
+                  명장의<br/>정선된 빵
                 </h1>
                 <p className="text-xl text-gray-600 max-w-3xl leading-relaxed font-light">
                   40년의 경험과 철학이 담긴 프리미엄 메뉴.
-                  <br />
+                  <br/>
                   <span className="text-gray-700 font-semibold">매 순간을 특별하게 만드는 빵뜨락의 자부심입니다.</span>
                 </p>
                 
@@ -94,6 +96,11 @@ export default function MenuPage() {
             </div>
           </Reveal>
         </div>
+      </section>
+
+      {/* MENU SECTIONS */}
+      <section className="py-24 lg:py-40 bg-white border-t border-yellow-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {menuCategories.map((section, sectionIdx) => (
           <section key={sectionIdx} className="mb-40">
@@ -180,14 +187,15 @@ export default function MenuPage() {
           </section>
         ))}
 
-        <Reveal className="bg-gradient-to-r from-yellow-700 to-yellow-800 text-white p-16 rounded-3xl text-center">
+        <Reveal className="bg-gradient-to-r from-yellow-700 to-yellow-800 text-white p-16 rounded-3xl text-center mt-20">
           <h3 className="text-4xl font-bold mb-8">특별한 요청 환영합니다</h3>
           <p className="text-lg font-light mb-10 opacity-90 max-w-2xl mx-auto">
             커스텀 주문, 기업 행사, 웨딩 케이크 등 특별한 날을 위해 명장이 직접 준비합니다.
           </p>
           <a href="tel:031-123-4567" className="inline-block bg-white text-yellow-700 px-10 py-4 rounded-full font-bold hover:bg-gray-100 transition-all">031-123-4567</a>
         </Reveal>
-      </div>
+        </div>
+      </section>
 
       {/* 온라인 예약 모달 */}
       {isReserveOpen && (
