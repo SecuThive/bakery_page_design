@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import { ReservationModal } from './components/ReservationModal';
+import Home from './pages/Home';
+import HistoryPage from './pages/HistoryPage';
+import MenuPage from './pages/MenuPage';
+import SchedulePage from './pages/SchedulePage';
 
-function App() {
+export default function App() {
+  const [isReserveOpen, setIsReserveOpen] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="bg-white text-stone-800 font-sans selection:bg-stone-100 overflow-x-hidden">
+        <Navbar onReserveOpen={() => setIsReserveOpen(true)} onHistoryOpen={() => {}} />
+        
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/menu" element={<MenuPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+        </Routes>
+
+        <ReservationModal isOpen={isReserveOpen} onClose={() => setIsReserveOpen(false)} />
+      </div>
+    </Router>
   );
 }
-
-export default App;
