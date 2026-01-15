@@ -25,3 +25,5 @@ export const Reveal = ({ children, className = "", delay = 0 }) => {
     </div>
   );
 };
+
+export default Reveal;

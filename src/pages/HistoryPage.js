@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useBakery } from '../context/BakeryContext';
 import { Reveal } from '../components/Reveal';
 
 export default function HistoryPage() {
   const navigate = useNavigate();
+  const { pageInfo } = useBakery();
   const [isReserveOpen, setIsReserveOpen] = useState(false);
 
   return (
@@ -29,10 +31,10 @@ export default function HistoryPage() {
                   <span className="text-yellow-700 text-xs font-bold tracking-[0.3em] uppercase">명장의 이야기</span>
                 </div>
                 <h1 className="text-6xl lg:text-7xl font-serif font-bold text-gray-900 mb-6 leading-tight">
-                  40년의 철학<br/>그리고 정성
+                  {pageInfo.masterStory.title}<br/>그리고 정성
                 </h1>
                 <p className="text-xl text-gray-600 max-w-3xl leading-relaxed font-light">
-                  대한민국 제과명장 김뜨락과 함께 한 시간들.
+                  {pageInfo.masterStory.subtitle}
                   <br/>
                   <span className="text-gray-700 font-semibold">한 덩이의 빵에 담긴 40년의 철학을 만나보세요.</span>
                 </p>
@@ -48,7 +50,7 @@ export default function HistoryPage() {
           <Reveal delay={100} className="mb-24">
             <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-gray-200">
               <img 
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=1600" 
+                src={pageInfo.masterStory.image}
                 alt="Master Baker" 
                 className="w-full h-full object-cover"
               />
@@ -64,10 +66,10 @@ export default function HistoryPage() {
           {/* 명장 소개 텍스트 */}
           <Reveal delay={200} className="mb-24 bg-gradient-to-br from-yellow-50 to-white p-12 lg:p-16 rounded-3xl border-l-4 border-yellow-700 shadow-lg hover:shadow-xl transition-all">
             <p className="text-2xl font-light text-gray-800 leading-relaxed mb-6 italic">
-              "동인천 바닷바람을 맞으며 새벽을 열었던 1984년, 빵은 누군가에게 하루를 버틸 따뜻한 위로여야 했습니다."
+              "{pageInfo.masterStory.description}"
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              매일 새벽 3시에 시작되는 명장의 일상. 프랑스에서 배운 정통 기법과 한국인의 정서를 담아낸 40년의 철학이 이곳 인천에서 가장 정직한 빵으로 탄생합니다.
+              {pageInfo.masterStory.detail}
             </p>
           </Reveal>
 

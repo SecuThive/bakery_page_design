@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useBakery } from '../context/BakeryContext';
 import { Reveal } from '../components/Reveal';
 
 export default function Home() {
   const [isReserveOpen, setIsReserveOpen] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState(null);
   const navigate = useNavigate();
+  const { menus, pageInfo } = useBakery();
 
   return (
     <div className="bg-white text-gray-900 font-serif selection:bg-yellow-100 overflow-x-hidden">
@@ -54,7 +57,7 @@ export default function Home() {
                 <div 
                   className="absolute inset-0 bg-cover bg-center rounded-lg overflow-hidden shadow-lg"
                   style={{
-                    backgroundImage: 'url("https://images.unsplash.com/photo-1585478259715-876a6a81fc08?auto=format&fit=crop&q=80&w=800")',
+                    backgroundImage: `url("${pageInfo.homeHeroImage}")`,
                   }}
                 >
                   <div className="absolute inset-0 bg-black/10"></div>
@@ -158,40 +161,28 @@ export default function Home() {
 
           {/* 메뉴 카드 그리드 */}
           <div className="grid md:grid-cols-3 gap-12 mb-16">
-            {[
-              { 
-                n: "인천 사워도우", 
-                p: "₩8,000",
-                d: "72시간 저온 발효로 완성된 깊이 있는 풍미",
-              },
-              { 
-                n: "트러플 소금빵", 
-                p: "₩5,500",
-                d: "프랑스산 고메 버터와 귀한 트러플의 만남",
-              },
-              { 
-                n: "헤리티지 깜빠뉴", 
-                p: "₩9,000",
-                d: "견과류의 고소함과 통밀의 건강함",
-              }
-            ].map((item, idx) => (
+            {menus.slice(0, 3).map((item, idx) => (
               <Reveal key={idx} delay={idx * 100}>
                 <div className="group cursor-pointer">
-                  <div className="relative h-64 bg-gray-200 rounded-lg overflow-hidden mb-6 shadow-md">
-                    <div className="absolute inset-0 bg-cover bg-center opacity-100 group-hover:opacity-90 transition-opacity" 
-                      style={{backgroundImage: 'url("https://images.unsplash.com/photo-1585478259715-876a6a81fc08?auto=format&fit=crop&q=80&w=400")'}}
-                    ></div>
-                    <div className="absolute top-4 right-4 px-3 py-1 bg-yellow-600 text-white text-xs font-bold uppercase rounded">Best</div>
+                  <div className="relative h-64 bg-gray-200 rounded-lg overflow-hidden mb-6 shadow-md" onClick={() => setSelectedMenu(item)}>
+                    <img 
+                      src={item.image}
+                      alt={item.name}
+                      className="absolute inset-0 w-full h-full object-cover opacity-100 group-hover:opacity-90 transition-opacity"
+                      onError={(e) => e.target.src = 'https://via.placeholder.com/400x300?text=No+Image'}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    {item.badge && <div className="absolute top-4 right-4 px-3 py-1 bg-yellow-600 text-white text-xs font-bold uppercase rounded">{item.badge}</div>}
                   </div>
-                  <h5 className="text-xl font-semibold text-gray-900 mb-2">{item.n}</h5>
-                  <p className="text-gray-600 text-sm font-light mb-4">{item.d}</p>
+                  <h5 className="text-xl font-semibold text-gray-900 mb-2">{item.name}</h5>
+                  <p className="text-gray-600 text-sm font-light mb-4">{item.description}</p>
                   <div className="flex justify-between items-center">
-                    <span className="text-yellow-700 font-semibold text-lg">{item.p}</span>
+                    <span className="text-yellow-700 font-semibold text-lg">₩{item.price.toLocaleString()}</span>
                     <button 
-                      onClick={() => setIsReserveOpen(true)}
+                      onClick={() => setSelectedMenu(item)}
                       className="text-xs font-semibold text-yellow-700 hover:text-yellow-800 border-b border-yellow-600/50 pb-1 transition-colors"
                     >
-                      주문하기
+                      상세보기
                     </button>
                   </div>
                 </div>
@@ -247,7 +238,64 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. 예약 CTA 섹션 */}
+      {/* 6. 고객 후기 섹션 */}
+      <section className="py-24 lg:py-40 bg-white border-t border-yellow-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <Reveal className="text-center mb-20">
+            <span className="text-yellow-600 text-xs font-bold tracking-[0.3em] uppercase block mb-6">고객의 목소리</span>
+            <h2 className="text-5xl lg:text-6xl font-light text-gray-900 mb-6">
+              명장의 빵을<br/>경험한 분들
+            </h2>
+            <p className="text-gray-600 font-light max-w-2xl mx-auto">
+              매일 아침 화덕에서 구워지는 신선함과 정성이 담긴 빵을 경험한 고객들의 후기입니다
+            </p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {pageInfo.reviews.map((review, idx) => (
+              <Reveal key={review.id} delay={idx * 100}>
+                <div className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-8 border border-gray-200 hover:shadow-lg transition-all duration-500">
+                  {/* 별점 */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <svg 
+                        key={i} 
+                        className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'}`} 
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+
+                  {/* 후기 내용 */}
+                  <p className="text-gray-700 font-light text-lg mb-6 leading-relaxed">
+                    "{review.content}"
+                  </p>
+
+                  {/* 고객 정보 */}
+                  <div className="pt-6 border-t border-gray-200">
+                    <p className="text-stone-800 font-semibold">{review.name}</p>
+                    <p className="text-gray-500 text-sm">고객</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* 더보기 버튼 */}
+          <Reveal className="text-center mt-16">
+            <button 
+              onClick={() => navigate('/history')}
+              className="px-10 py-3 border border-yellow-600 text-yellow-700 font-light tracking-wide hover:bg-yellow-50 transition-all"
+            >
+              모든 후기 보기
+            </button>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* 7. 예약 CTA 섹션 */}
       <section className="py-32 lg:py-40 bg-gradient-to-r from-yellow-50 to-white border-t border-yellow-100 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-100/30 rounded-full blur-3xl"></div>
@@ -272,7 +320,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. FOOTER */}
+      {/* 8. FOOTER */}
       <footer className="bg-white text-gray-700 py-20 px-6 lg:px-8 border-t border-yellow-100">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12 pb-12 border-b border-gray-300">
@@ -346,6 +394,160 @@ export default function Home() {
               >
                 예약 완료
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 상세보기 모달 */}
+      {selectedMenu && (
+        <div className="fixed inset-0 z-[102] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setSelectedMenu(null)}></div>
+          <div className="relative z-10 bg-white w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setSelectedMenu(null)}
+              className="absolute top-6 right-6 z-20 text-gray-400 hover:text-gray-600 transition-colors bg-white rounded-full p-2"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="grid md:grid-cols-2 gap-0">
+              {/* 좌측: 이미지 영역 */}
+              <div className="relative h-96 md:h-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col items-center justify-center p-8">
+                <div className="text-9xl animate-bounce mb-8">🥐</div>
+                <div className="text-center">
+                  <div className="flex gap-1 justify-center mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 font-semibold">고객 만족도 4.9/5.0</p>
+                  <p className="text-gray-500 text-sm">(342개 리뷰)</p>
+                </div>
+              </div>
+
+              {/* 우측: 정보 영역 */}
+              <div className="p-8 md:p-12 flex flex-col">
+                {/* 헤더 정보 */}
+                <div className="mb-8">
+                  {/* 뱃지 */}
+                  <div className="mb-4 flex gap-2">
+                    <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-yellow-100 text-yellow-700">
+                      시그니처
+                    </span>
+                    <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-green-100 text-green-700">
+                      ✓ 인기 상품
+                    </span>
+                  </div>
+
+                  {/* 제목 및 설명 */}
+                  <h2 className="text-4xl font-bold text-gray-900 mb-2">
+                    {selectedMenu.name || selectedMenu.n}
+                  </h2>
+                  <p className="text-gray-600 font-light text-lg leading-relaxed">
+                    {selectedMenu.description || selectedMenu.d}
+                  </p>
+                </div>
+
+                {/* 가격 정보 */}
+                <div className="mb-8 pb-8 border-b border-gray-200">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-5xl font-bold text-yellow-700">₩{typeof selectedMenu.price === 'string' ? selectedMenu.price : selectedMenu.price.toLocaleString()}</span>
+                    <span className="text-gray-500 line-through text-lg">₩{typeof selectedMenu.price === 'string' ? parseInt(selectedMenu.price) + 2000 : selectedMenu.price + 2000}</span>
+                    <span className="text-red-600 font-bold text-lg">10% 할인</span>
+                  </div>
+                  <p className="text-gray-600 font-light text-sm mt-2">당일 구매 시 추가 할인 혜택!</p>
+                </div>
+
+                {/* 상세 정보 */}
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">주요 특징</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-yellow-600">⏱️</span>
+                        <span className="text-gray-700 font-light">72시간 저온발효로 깊은 맛</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-yellow-600">🌾</span>
+                        <span className="text-gray-700 font-light">천연 발효종으로 건강하게</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-yellow-600">✨</span>
+                        <span className="text-gray-700 font-light">매일 새벽에 정성으로 구움</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">영양정보 (100g 기준)</h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-600 font-light">칼로리</p>
+                        <p className="text-gray-900 font-semibold">265 kcal</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-light">단백질</p>
+                        <p className="text-gray-900 font-semibold">9.2g</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-light">탄수화물</p>
+                        <p className="text-gray-900 font-semibold">48.5g</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-light">지방</p>
+                        <p className="text-gray-900 font-semibold">3.8g</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">보관 방법</h3>
+                    <p className="text-gray-700 font-light">실온(15~20℃)에서 2-3일 보관 가능합니다. 냉동실에 보관하면 1개월까지 보관 가능하며, 섭취 전 실온에서 1시간 해동해주세요.</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">추천 조합</h3>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-light">따뜻한 커피</span>
+                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-light">버터</span>
+                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-light">잼</span>
+                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-light">치즈</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">알레르기 정보</h3>
+                    <p className="text-gray-700 font-light text-sm">
+                      함유: <span className="font-semibold">밀, 계란, 우유, 버터</span><br/>
+                      시설: <span className="font-semibold">견과류 포함 시설에서 생산</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* 하단: 액션 버튼 */}
+                <div className="flex gap-3 mt-auto pt-8 border-t border-gray-200">
+                  <button 
+                    onClick={() => {
+                      setIsReserveOpen(true);
+                      setSelectedMenu(null);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white py-4 rounded-xl font-bold text-lg hover:from-yellow-700 hover:to-yellow-800 transition-all shadow-lg hover:shadow-xl"
+                  >
+                    지금 예약하기
+                  </button>
+                  <button 
+                    onClick={() => setSelectedMenu(null)}
+                    className="flex-1 border-2 border-gray-300 text-gray-700 py-4 rounded-xl font-bold text-lg hover:border-gray-400 transition-all"
+                  >
+                    계속 보기
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useBakery } from '../context/BakeryContext';
 import { Reveal } from '../components/Reveal';
 
 export default function SchedulePage() {
   const [isReserveOpen, setIsReserveOpen] = useState(false);
   const navigate = useNavigate();
-
-  const scheduleData = [
-    { t: "09:00", i: "식빵 및 건강 식사빵", d: "우유 식빵, 잡곡빵, 밤식빵 등 담백한 아침을 위한 빵", emoji: "🍞" },
-    { t: "11:30", i: "크로와상 및 페이스트리", d: "바삭한 결이 살아있는 명장의 프랑스 정통 베이커리", emoji: "🥐" },
-    { t: "14:00", i: "바게트, 사워도우, 깜빠뉴", d: "72시간 저온 발효를 마친 건강한 식사 대용 빵", emoji: "🥖" }
-  ];
+  const { pageInfo } = useBakery();
 
   return (
     <div className="bg-white text-gray-900 font-serif selection:bg-yellow-100 overflow-x-hidden">
@@ -57,7 +53,7 @@ export default function SchedulePage() {
           </Reveal>
 
           <div className="space-y-8">
-            {scheduleData.map((item, idx) => (
+            {pageInfo.bakingSchedule.map((item, idx) => (
               <Reveal key={idx} delay={idx * 100}>
                 <div className="group relative">
                   <div className="absolute left-0 top-1/2 w-16 h-16 bg-yellow-100 rounded-full transform -translate-y-1/2 -translate-x-8 group-hover:bg-yellow-200 transition-all"></div>
@@ -65,13 +61,12 @@ export default function SchedulePage() {
                     <div className="grid md:grid-cols-4 gap-8 items-center">
                       <div className="flex flex-col md:col-span-1">
                         <span className="text-xs text-yellow-700 font-bold tracking-[0.3em] uppercase block mb-3">시간</span>
-                        <span className="text-5xl font-bold text-gray-900">{item.t}</span>
+                        <span className="text-5xl font-bold text-gray-900">{item.time}</span>
                       </div>
                       <div className="md:col-span-3 flex items-start gap-6">
-                        <span className="text-6xl">{item.emoji}</span>
+                        <span className="text-6xl">{item.icon}</span>
                         <div>
-                          <h4 className="text-2xl font-bold text-gray-900 mb-3">{item.i}</h4>
-                          <p className="text-gray-600 font-light text-lg leading-relaxed">{item.d}</p>
+                          <h4 className="text-2xl font-bold text-gray-900 mb-3">{item.item}</h4>
                         </div>
                       </div>
                     </div>
@@ -95,27 +90,13 @@ export default function SchedulePage() {
             <Reveal delay={350}>
               <div className="bg-gradient-to-br from-yellow-50 to-white p-10 lg:p-12 rounded-3xl border-2 border-yellow-200 hover:shadow-xl transition-all">
                 <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                  <span className="text-3xl">📍</span> 인천 본점
+                  <span className="text-3xl">📍</span> 연락처 정보
                 </h3>
                 <div className="space-y-5 text-base font-light text-gray-700">
-                  <p><span className="font-bold text-gray-900 block mb-1">주소</span>인천광역시 중구 어느 골목길 123</p>
-                  <p><span className="font-bold text-gray-900 block mb-1">전화</span>031-123-4567</p>
-                  <p><span className="font-bold text-gray-900 block mb-1">운영시간</span>AM 09:00 - PM 20:00</p>
-                  <p><span className="font-bold text-gray-900 block mb-1">휴무</span><span className="text-yellow-700 font-bold">매주 월요일</span></p>
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal delay={400}>
-              <div className="bg-gradient-to-br from-yellow-50 to-white p-10 lg:p-12 rounded-3xl border-2 border-yellow-200 hover:shadow-xl transition-all">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                  <span className="text-3xl">📍</span> 기흥점
-                </h3>
-                <div className="space-y-5 text-base font-light text-gray-700">
-                  <p><span className="font-bold text-gray-900 block mb-1">주소</span>경기도 용인시 기흥구 베이커리 가든 1</p>
-                  <p><span className="font-bold text-gray-900 block mb-1">전화</span>031-987-6543</p>
-                  <p><span className="font-bold text-gray-900 block mb-1">운영시간</span>AM 10:00 - PM 21:00</p>
-                  <p><span className="font-bold text-gray-900 block mb-1">휴무</span><span className="text-yellow-700 font-bold">매주 월요일</span></p>
+                  <p><span className="font-bold text-gray-900 block mb-1">전화</span>{pageInfo.contact.phone}</p>
+                  <p><span className="font-bold text-gray-900 block mb-1">주소</span>{pageInfo.contact.address}</p>
+                  <p><span className="font-bold text-gray-900 block mb-1">운영시간</span>{pageInfo.contact.hours}</p>
+                  <p><span className="font-bold text-gray-900 block mb-1">휴무</span><span className="text-yellow-700 font-bold">{pageInfo.contact.closed}</span></p>
                 </div>
               </div>
             </Reveal>
@@ -169,6 +150,53 @@ export default function SchedulePage() {
                 </button>
               </Reveal>
             </div>
+        </div>
+      </section>
+
+      {/* 고객 후기 섹션 */}
+      <section className="py-24 lg:py-40 bg-gradient-to-b from-gray-50 to-white border-t border-yellow-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <Reveal className="text-center mb-20">
+            <span className="text-yellow-600 text-xs font-bold tracking-[0.3em] uppercase block mb-6">고객의 목소리</span>
+            <h2 className="text-5xl lg:text-6xl font-light text-gray-900 mb-6">
+              명장의 빵을<br/>경험한 분들
+            </h2>
+            <p className="text-gray-600 font-light max-w-2xl mx-auto">
+              신선함과 정성이 담긴 빵을 경험한 고객들의 생생한 후기입니다
+            </p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {pageInfo.reviews.map((review, idx) => (
+              <Reveal key={review.id} delay={idx * 100}>
+                <div className="bg-white rounded-lg p-8 border border-gray-200 hover:shadow-lg transition-all duration-500">
+                  {/* 별점 */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <svg 
+                        key={i} 
+                        className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'}`} 
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+
+                  {/* 후기 내용 */}
+                  <p className="text-gray-700 font-light text-lg mb-6 leading-relaxed">
+                    "{review.content}"
+                  </p>
+
+                  {/* 고객 정보 */}
+                  <div className="pt-6 border-t border-gray-200">
+                    <p className="text-stone-800 font-semibold">{review.name}</p>
+                    <p className="text-gray-500 text-sm">고객</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
